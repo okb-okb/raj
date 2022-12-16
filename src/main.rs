@@ -1,6 +1,6 @@
 mod commands;
 
-use clap::{command};
+use clap::command;
 use commands::{all, runner};
 
 fn main() {
@@ -26,7 +26,7 @@ fn main() {
         ),
         Some(("make", sub_matches)) => runner::make::run_make_command(
             sub_matches.get_one::<String>("CONTEST"),
-            sub_matches.get_one::<u8>("number")
+            sub_matches.get_one::<u8>("number"),
         ),
         _ => unreachable!("Unexpected error occurs."),
     }
