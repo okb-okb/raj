@@ -36,7 +36,7 @@ fn run_oj_download(contest_name: &String, problem_name: &String) {
     exec(make_download_command(contest_name, problem_name));
 }
 
-fn make_compile_command(file_name: &String) -> (String, Vec<String>) {
+fn make_compile_command(file_name: &str) -> (String, Vec<String>) {
     let (program, args) = match env::var("RAJ_COMPILE") {
         Ok(command) => {
             let splited_command: Vec<String> =
@@ -51,15 +51,13 @@ fn make_compile_command(file_name: &String) -> (String, Vec<String>) {
             };
 
             splited_command.pop_front();
-            splited_command.push_back(file_name.clone());
+            splited_command.push_back(file_name.to_owned());
 
             (program, Vec::from(splited_command))
         }
         Err(_) => (
             String::from("rustc"),
-            ["-o", "a.out", file_name.as_str()]
-                .map(String::from)
-                .to_vec(),
+            ["-o", "a.out", file_name].map(String::from).to_vec(),
         ),
     };
 
@@ -74,12 +72,9 @@ fn make_test_command(tolerance: Option<&u8>) -> (String, Vec<String>) {
     let mut args = vec![String::from("t")];
     let parameter = String::from("1e-");
 
-    match tolerance {
-        Some(tolerance) => {
-            args.push(String::from("-e"));
-            args.push(parameter + &tolerance.to_string());
-        }
-        None => (),
+    if let Some(tolerance) = tolerance {
+        args.push(String::from("-e"));
+        args.push(parameter + &tolerance.to_string());
     }
 
     (String::from("oj"), args)
