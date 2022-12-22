@@ -36,3 +36,67 @@ pub fn run_submit_command(
 ) {
     exec(make_submit_command(contest_name, problem_name, file_name));
 }
+
+#[cfg(test)]
+mod tests {
+    use super::make_submit_command;
+    use std::env;
+
+    #[test]
+    fn success_make_submit_command() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        let file_name = String::from("template.rs");
+        let (command, args) =
+            make_submit_command(Some(&contest_name), Some(&problem_name), Some(&file_name));
+        assert_eq!(command, String::from("oj"));
+        assert_eq!(
+            args,
+            vec![
+                String::from("s"),
+                String::from("https://abc150.contest.atcoder.jp/tasks/abc150_a"),
+                String::from("template.rs")
+            ]
+        );
+    }
+
+    #[test]
+    fn success_make_submit_command_no_file_name() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        let (command, args) = make_submit_command(Some(&contest_name), Some(&problem_name), None);
+        assert_eq!(command, String::from("oj"));
+        assert_eq!(
+            args,
+            vec![
+                String::from("s"),
+                String::from("https://abc150.contest.atcoder.jp/tasks/abc150_a"),
+                String::from("abc150_a.rs")
+            ]
+        );
+    }
+
+    #[test]
+    fn success_make_submit_command_with_extension() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        env::set_var("RAJ_EXTENSION", "cpp");
+        let (command, args) = make_submit_command(Some(&contest_name), Some(&problem_name), None);
+        assert_eq!(command, String::from("oj"));
+        assert_eq!(
+            args,
+            vec![
+                String::from("s"),
+                String::from("https://abc150.contest.atcoder.jp/tasks/abc150_a"),
+                String::from("abc150_a.cpp")
+            ]
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn fail_make_submit_command_no_required_parameters() {
+        let contest_name = String::from("abc150");
+        let (_command, _args) = make_submit_command(Some(&contest_name), None, None);
+    }
+}

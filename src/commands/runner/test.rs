@@ -103,3 +103,55 @@ pub fn run_test_command(
     compile(&file_name);
     run_oj_test(tolerance);
 }
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn success_get_test_file_info() {}
+
+    #[test]
+    fn success_get_test_file_info_with_extension() {}
+
+    #[test]
+    fn success_get_test_file_info_no_file_name() {}
+
+    #[test]
+    #[should_panic]
+    fn fail_get_test_file_info_no_required_parameters() {
+        panic!("panic");
+    }
+
+    #[test]
+    fn success_make_download_command() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        let (command, args) = make_download_command(&contest_name, &problem_name);
+        assert_eq!(command, String::from("oj"));
+        assert_eq!(
+            args,
+            vec![
+                String::from("d"),
+                String::from("https://abc150.contest.atcoder.jp/tasks/abc150_a")
+            ]
+        );
+    }
+
+    #[test]
+    fn success_make_compile_command() {}
+
+    #[test]
+    fn success_make_compile_command_with_args() {}
+
+    #[test]
+    #[should_panic]
+    fn fail_make_compile_command_invalid_args() {
+        panic!("panic");
+    }
+
+    #[test]
+    fn success_make_test_command() {}
+
+    #[test]
+    fn success_make_test_command_with_tolerance() {}
+}

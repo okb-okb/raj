@@ -55,3 +55,30 @@ pub fn run_make_command(contest_name: Option<&String>, problem_number: Option<&u
     make_contest_directory(contest_name);
     make_solution_files(contest_name, problem_number);
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn success_make_contest_directory() {}
+
+    #[test]
+    fn fail_make_contest_directory_no_contest_name() {}
+
+    #[test]
+    fn success_make_cp_command_normal() {}
+
+    #[test]
+    fn success_make_cp_command_with_extension() {}
+
+    #[test]
+    fn success_make_cp_command_with_template_file() {}
+
+    #[test]
+    fn success_make_solution_files() {}
+
+    #[test]
+    fn success_make_solution_files_no_problem_number() {}
+
+    #[test]
+    fn fail_make_solution_files_no_contest_name() {}
+}
