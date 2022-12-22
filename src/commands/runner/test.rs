@@ -72,14 +72,12 @@ fn compile(file_name: &String) {
 
 fn make_test_command(tolerance: Option<&u8>) -> (String, Vec<String>) {
     let mut args = vec![String::from("t")];
-    let mut parameter = String::from("1e-");
+    let parameter = String::from("1e-");
 
     match tolerance {
         Some(tolerance) => {
             args.push(String::from("-e"));
-
-            parameter.push(*tolerance as char);
-            args.push(parameter);
+            args.push(parameter + &tolerance.to_string());
         }
         None => (),
     }
@@ -104,22 +102,57 @@ pub fn run_test_command(
     run_oj_test(tolerance);
 }
 
+#[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{
+        get_test_file_info, make_compile_command, make_download_command, make_test_command,
+    };
+    use serial_test::serial;
+    use std::{env, panic};
 
     #[test]
-    fn success_get_test_file_info() {}
+    #[serial]
+    fn success_get_test_file_info() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        let file_name = String::from("template.rs");
+        let (contest_name, problem_name, file_name) =
+            get_test_file_info(Some(&contest_name), Some(&problem_name), Some(&file_name));
+        assert_eq!(contest_name, &String::from("abc150"));
+        assert_eq!(problem_name, &String::from("a"));
+        assert_eq!(file_name, String::from("template.rs"));
+    }
 
     #[test]
-    fn success_get_test_file_info_with_extension() {}
+    #[serial]
+    fn success_get_test_file_info_with_extension() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        env::set_var("RAJ_EXTENSION", "cpp");
+        let (contest_name, problem_name, file_name) =
+            get_test_file_info(Some(&contest_name), Some(&problem_name), None);
+        assert_eq!(contest_name, &String::from("abc150"));
+        assert_eq!(problem_name, &String::from("a"));
+        assert_eq!(file_name, String::from("abc150_a.cpp"));
+        env::remove_var("RAJ_EXTENSION");
+    }
 
     #[test]
-    fn success_get_test_file_info_no_file_name() {}
+    #[serial]
+    fn success_get_test_file_info_default_extension() {
+        let contest_name = String::from("abc150");
+        let problem_name = String::from("a");
+        let (contest_name, problem_name, file_name) =
+            get_test_file_info(Some(&contest_name), Some(&problem_name), None);
+        assert_eq!(contest_name, &String::from("abc150"));
+        assert_eq!(problem_name, &String::from("a"));
+        assert_eq!(file_name, String::from("abc150_a.rs"));
+    }
 
     #[test]
     #[should_panic]
     fn fail_get_test_file_info_no_required_parameters() {
-        panic!("panic");
+        let (_contest_name, _problem_name, _file_name) = get_test_file_info(None, None, None);
     }
 
     #[test]
@@ -138,20 +171,64 @@ mod tests {
     }
 
     #[test]
-    fn success_make_compile_command() {}
-
-    #[test]
-    fn success_make_compile_command_with_args() {}
-
-    #[test]
-    #[should_panic]
-    fn fail_make_compile_command_invalid_args() {
-        panic!("panic");
+    #[serial]
+    fn success_make_compile_command() {
+        let file_name = String::from("template.rs");
+        let (command, args) = make_compile_command(&file_name);
+        assert_eq!(command, String::from("rustc"));
+        assert_eq!(
+            args,
+            vec![
+                String::from("-o"),
+                String::from("a.out"),
+                String::from("template.rs")
+            ]
+        );
     }
 
     #[test]
-    fn success_make_test_command() {}
+    #[serial]
+    fn success_make_compile_command_with_args() {
+        let file_name = String::from("template.rs");
+        env::set_var("RAJ_COMPILE", "test compile command");
+        let (command, args) = make_compile_command(&file_name);
+        assert_eq!(command, String::from("test"));
+        assert_eq!(
+            args,
+            vec![
+                String::from("compile"),
+                String::from("command"),
+                String::from("template.rs")
+            ]
+        );
+    }
 
     #[test]
-    fn success_make_test_command_with_tolerance() {}
+    #[serial]
+    fn fail_make_compile_command_invalid_args() {
+        let file_name = String::from("template.rs");
+        env::set_var("RAJ_COMPILE", "");
+        let result = panic::catch_unwind(|| {
+            let (_command, _args) = make_compile_command(&file_name);
+        });
+        env::remove_var("RAJ_COMPILE");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn success_make_test_command() {
+        let (command, args) = make_test_command(Some(&8));
+        assert_eq!(command, String::from("oj"));
+        assert_eq!(
+            args,
+            vec![String::from("t"), String::from("-e"), String::from("1e-8")]
+        );
+    }
+
+    #[test]
+    fn success_make_test_command_no_tolerance() {
+        let (command, args) = make_test_command(None);
+        assert_eq!(command, String::from("oj"));
+        assert_eq!(args, vec![String::from("t")]);
+    }
 }

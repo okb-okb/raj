@@ -40,6 +40,7 @@ pub fn run_submit_command(
 #[cfg(test)]
 mod tests {
     use super::make_submit_command;
+    use serial_test::serial;
     use std::env;
 
     #[test]
@@ -61,6 +62,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn success_make_submit_command_no_file_name() {
         let contest_name = String::from("abc150");
         let problem_name = String::from("a");
@@ -77,6 +79,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn success_make_submit_command_with_extension() {
         let contest_name = String::from("abc150");
         let problem_name = String::from("a");
@@ -91,12 +94,12 @@ mod tests {
                 String::from("abc150_a.cpp")
             ]
         );
+        env::remove_var("RAJ_EXTENSION");
     }
 
     #[test]
     #[should_panic]
     fn fail_make_submit_command_no_required_parameters() {
-        let contest_name = String::from("abc150");
-        let (_command, _args) = make_submit_command(Some(&contest_name), None, None);
+        let (_command, _args) = make_submit_command(None, None, None);
     }
 }
