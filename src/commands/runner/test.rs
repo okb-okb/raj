@@ -64,7 +64,7 @@ fn make_compile_command(file_name: &str) -> (String, Vec<String>) {
     (program, args)
 }
 
-fn compile(file_name: &String) {
+fn compile(file_name: &str) {
     exec(make_compile_command(file_name));
 }
 
