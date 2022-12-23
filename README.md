@@ -1,4 +1,6 @@
 # raj
+![workflow](https://github.com/okb-okb/raj/actions/workflows/ci.yml/badge.svg)
+![GitHub](https://img.shields.io/github/license/okb-okb/raj?label=license)
 
 ## About
 raj (rust atcoder judge) is a wrapper of [oj](https://github.com/online-judge-tools/oj) specialized for [atcoder](https://atcoder.jp/).
