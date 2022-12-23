@@ -5,7 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        name: Check out repository code
       - uses: actions/cache@v3
+        name: Get cache if exists
         with:
           path: |
             ~/.cargo/registry
@@ -13,18 +15,22 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions-rs/toolchain@v1
+        name: Install fmt and clippy
         with: 
           toolchain: stable
           components: rustfmt, clippy
       - uses: actions-rs/cargo@v1
+        name: Run cargo fmt
         with:
           command: fmt
           args: --all -- --check
       - uses: actions-rs/cargo@v1
+        name: Run cargo clippy
         with:
           command: clippy
           args: -- -D warnings
       - uses: actions-rs/cargo@v1
+        name: Run cargo test
         with:
           command: test
           args: --release --all-features
